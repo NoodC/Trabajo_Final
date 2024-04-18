@@ -192,6 +192,29 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
         }
 }
 
+/*Funcion que permite disparar, recibe como parametro el tablero rival y las coordenadas (x,y)
+Devuelve un valor que indica la validez del disparo: 0 si el disparo no ha sido exitoso, 1 si el disparo ha sido exitoso, 
+-1 si ya se ha disparado en esa casilla
+Pensado para que pueda usarse tambien con los misiles*/
+int shoot(struct square board[21][21], int x, int y){
+    if (board[x][y].bombed == 1) return -1;
+    board[x][y].bombed = 1;
+    if (board[x][y].is_ship == 1) return 1;
+    return 0;
+}
+
+/*Funcion que permite lanzar la bomba atomica, recibe como parametro el tablero del usuario y las coordenadas centrales (x,y), pero cubre un rango de 5x5
+No puede ser lanzada en una casilla ya bombardeada o en las 2 filas y columnas mas externas de cada borde*/
+int nuke(struct square board[21][21], int x, int y){
+    if ((x-2)<0 || (y-2)<0 || (x+2)>=21 || (y+2)>=21) return -2; // Fuera de rango
+    if (board[x][y].bombed == 1) return -1; // Ya bombardeada
+    for (int i = x-2; i <= x+2; i++){
+        for (int j = y-2; j <= y+2; j++){
+            if ((i >= 0) && (j >= 0) && (i < 21) && (j < 21)) board[i][j].is_ship = 1;
+        }
+    }
+    return 0; // Disparo exitoso
+}
 
 int main()
 {
