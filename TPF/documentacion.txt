@@ -1,0 +1,9 @@
+Documentacion Proyecto Batalla Naval
+
+*Tipos de estructuras de datos usados:
+    -Cada casilla es un struct con enteros que almacenan los datos relevantes a la casilla: el tipo de barco que contiene (o su ausencia), y si fue atacada o no. Ademas, almacena el dato de si la casilla es o no pivot del barco, para ayudar a ciertas funciones. Fue elegida por su versatilidad y capacidad de contener varios elementos de forma accesible
+    -Una matriz de structs para el tablero, 21x21, con coordenadas de formato (letra numero), con una funcion para converitr las letras a numeros. Fue elegida porque es la manera mas practica de representar un tablero
+    -Vectores auxiliares para acceder a los precios de barcos y habilidades. Permiten acceder a los numeros con el mismo dato que representa el tipo de barco.
+    -Un vector para cada jugador que lleva cuenta de la cantidad de cada tipo de barco, pues son requisitos para las habilidades.
+    -Un vector de caracteres que sirve como diccionario para la conversion de letras a numeros para las coordenadas, pues la matriz no admite letras como coordenadas.
+    -Todos los datos usados en las funciones son de tipo int (coordenadas, identificadores), porque son cortos, versatiles y perfectamente distinguibles.

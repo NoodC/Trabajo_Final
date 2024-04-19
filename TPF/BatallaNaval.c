@@ -21,9 +21,10 @@ Para referencia: (valor asignado;tipo;area)(la mina a efectos practicos es un ba
 struct square{
 	int is_ship;
 	int bombed;
+    int is_pivot;
 };
-
-struct pivot{
+//Struct no utilizado, pero se deja por si es util en el futuro
+/*struct pivot{
     int x;
     int y;
     int type;
@@ -42,8 +43,11 @@ void addship(struct pivot* pivotvector, int x, int y, int type, int rotation){
     pivotvector[i].y = y;
     pivotvector[i].type = type;
     pivotvector[i].rotation = rotation;
-}
-int shipregistry[7] = {0,0,0,0,0,0,0}; //Vector que registra cuantos barcos hay de cada tipo, la posicion 0 no es usada
+}*/
+int shipregistry1[7] = {0,0,0,0,0,0,0}; //Vector que registra cuantos barcos hay de cada tipo, la posicion 0 no es usada
+int shipregistry2[7] = {0,0,0,0,0,0,0};
+int shipprices[5]={30,20,50,10,5}; //Precios de cada tipo de barco
+int skillprices[4]={7,3,50,4}; //Precio de las habilidades: Ataque Aereo, Disparo triple, Bomba Nuclear, Minas
 
 /*Vector de letras para convertir coordenadas a caracteres*/
 char letras[21] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'}; 
@@ -56,7 +60,7 @@ int letranumero(char letra){
             return i+1;
         }
     }
-    return -1;
+    return -1; //Error
 }
 
 /*Funcion que coloca un barco, recibe como parametros el tablero, el tipo de barco, la orientacion y las coordenadas (x,y)
@@ -96,6 +100,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
                     }
                 }
             }
+            board[x][y].is_pivot = 1;
             return 0;
             break;
         case 2:
@@ -127,6 +132,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
                     }
                 }
             }
+            board[x][y].is_pivot = 1;
             return 0;
             break;
         case 3:
@@ -158,6 +164,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
                     }
                 }
             }
+            board[x][y].is_pivot = 1;
             return 0;
             break;
         case 4:
@@ -189,6 +196,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
                     }
                 }
             }
+            board[x][y].is_pivot = 1;
             return 0;
             break;
         case 5:
@@ -220,6 +228,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
                     }
                 }
             }
+            board[x][y].is_pivot = 1;
             return 0;
             break;
         default:
@@ -254,9 +263,8 @@ int nuke(struct square board[21][21], int x, int y){
 
 /*Funcion que realiza un ataque aereo en 7 casillas arriba de la coordenada (x,y). Devuelve 0 si no hubo impacto, 1 si hubo impacto */
 int airstrike(struct square board[21][21], int x, int y){
-    int excess = 0;
     int hit;
-    for (int j = (y - 1) ; j = (y - 7) ; j--){
+    for (int j = (y - 1) ; j == (y - 8) ; j--){
         if(j < 0) break; //Si se sale del rango del tablero, se rompe el loop
         board[x][j].bombed = 1;
         if(board[x][j].is_ship == 1) hit = 1;    
@@ -292,8 +300,164 @@ int mine(struct square board[21][21], int x, int y){
     return 0; //Colocado con exito
 }
 
+/*Funcion que permite verificar si un barco ha sido hundido, retorna 1 si es hundido, 0 si no*/
+/****A futuro, cambiar por una solucion con memoria dinamica, como un vector que almacene los barcos individualmente****/
+int is_ship_sunk(struct square board[21][21], int x, int y){ //Estas coordenadas deben ser el lugar donde hubo un ataque
+    if((board[x][y].is_ship == 1)&&(board[x][y].bombed == 1)) {
+        int i = 1;
+        int NotAShipX = 0;
+        int NotAShipY = 0;
+        int length, width, type, NotSunk;
+        while( ((board[x-i][y].is_pivot == 0)&&(board[x-i][y].is_ship == 1)&&(NotAShipX == 0)) || ((board[x][y-i].is_pivot == 0)&&(board[x][y-i].is_ship == 1)&&(NotAShipY == 0)) ){ //Busca un pivot para determinar el origen de un posible barco
+            i++;
+            if(board[x-i][y].is_ship == 0) NotAShipX = 1;
+            if(board[x][y-i].is_ship == 0) NotAShipY = 1;
+        }
+        if(NotAShipX == 0) type = board[x-i][y].is_ship;
+        if(NotAShipY == 0) type = board[x][y-i].is_ship;
+        switch(type){
+            case 1:
+                if(NotAShipX == 0) {
+                    length = 7;
+                    width = 2;
+                } else {
+                    length = 2;
+                    width = 7;
+                }
+                break;
+            case 2:
+                if(NotAShipX == 0) {
+                    length = 7;
+                    width = 1;
+                } else {
+                    length = 1;
+                    width = 7;
+                }
+                break;
+            case 3:
+                if(NotAShipX == 0) {
+                    length = 5;
+                    width = 1;
+                } else {
+                    length = 1;
+                    width = 5;
+                }
+                break;
+            case 4:
+                if(NotAShipX == 0) {
+                    length = 5;
+                    width = 1;
+                } else {
+                    length = 1;
+                    width = 5;
+                }
+                break;
+            case 5:
+                if(NotAShipX == 0) {
+                    length = 2;
+                    width = 1;
+                } else {
+                    length = 1;
+                    width = 2;
+                }
+                break;
+            default:
+                printf("Error al identificar el tipo de barco\n");
+                exit(-1);
+                break;
+        }
+        for (i = 0; i < length; i++){
+            for (int j = 0; j < width; j++){
+                if (board[i][j].bombed = 0) NotSunk = 1;
+            }
+        }
+        if(NotSunk == 1) return 0;
+        else return 1;
+    }
+}
 
+/*Funcion de maniobra evasiva, recibe como parametro un tablero y luego obtiene las coordenadas (x1,y1), (x2,y2) correspondientes a ambas puntas del barco solo para facilitar su ejecucion*/
+/****Esta funcion se va a beneficiar de un vector que almacene los barcos individualmente****/
 
+/***FUNCION INCOMPLETA Y SIN PROBAR***/
+
+/*int evasion(struct square board[21][21]){
+    int x1, y1, x2, y2, direccion;
+    char a1, a2;
+    printf("Ingrese las coordenadas de la punta del barco (donde fue colocado al principio):\n");
+    scanf("%c %d", &a1, &y1);
+    x1 = letranumero(a1);
+    printf("Ingrese las coordenadas de la cola del barco (en el caso del portaaviones, la esquina opuesta a la punta):\n");
+    scanf("%c %d", &a2, &y2);
+    x2 = letranumero(a2);
+    printf("Ingrese 1, 2, 3 o 4 para moverse  al norte, este, sur o oeste respectivamente\n");
+    scanf("%d", &direccion);
+    if(direccion == 1){
+        for (int i = y1; i < y1 + 1; i++){
+            if(board[x1][i].is_ship != 0){
+                return -1;
+            }
+        }
+        for (int i = y1; i < y1 + 1; i++){
+            for (int j = x1; j < x1 + 1; j++){
+            board[x1][i+1] = board[x1][i];
+            board[x2][i+1] = board[x2][i];
+            board[x1][i].is_ship = 0;
+            board[x2][i].is_ship = 0;
+            }
+        }
+        return (0);
+    } else if(direccion == 2){
+        for (int i = y1; i < y1 + 1; i++){
+            if(board[i][y2].is_ship != 0){
+                return -1;
+            }
+        }
+        for (int i = y1; i < y1 + 1; i++){
+            for (int j = x1; j < x1 + 1; j++){
+            board[i][y1] = board[i][y1];
+            board[i][y2] = board[i][y2];
+            board[i][y1].is_ship = 0;
+            board[i][y2].is_ship = 0;
+            }
+        }
+        return (0);
+    } else if(direccion == 3){
+       for (int i = y1; i < y1 + 1; i++){
+            if(board[x1][i].is_ship != 0){
+                return -1;
+            }
+        }
+        for (int i = y1; i < y1 + 1; i++){
+            for (int j = x1; j < x1 + 1; j++){
+            board[x1][i-1] = board[x1][i];
+            board[x2][i-1] = board[x2][i];
+            board[x1][i].is_ship = 0;
+            board[x2][i].is_ship = 0;
+            }
+        }
+        return (0);
+    } else if(direccion == 4){
+        x1++;
+        x2++;
+    }   
+    return 0;
+}
+*/
+
+/*Funcion para inicializar el tablero de la computadora, funcion placeholder, no es definitiva
+Coloca un buque en L6 en posicion vertical, y no compra municion con el oro restante*/
+int setupPC(struct square board[21][21]){ 
+    int barco = 2;
+    int x = 12;
+    int y = 6;
+    int lado = 2;
+    int PCflag =placement (board, barco, lado, x, y);
+    if (PCflag == 0) return 0;
+    else{ 
+        printf("No se pudo colocar el barco de la PC, saliendo...\n");
+        exit(-1);}
+}
 int main()
 {
     struct square myboard[21][21]; //Inicializacion del tablero del usuario
@@ -310,6 +474,7 @@ int main()
     int finishedloop = 0;
     while(((player1gold > 5) || (finishedplacing == 1))&&(finishedloop == 2)){ //El loop se completa por lo menos dos veces, debido a la bandera finishedloop
         int type, x, y, rotation;
+        char coord;
         printf("Ingrese el tipo de barco (1-5), 0 para terminar, si ya ha colocado un barco: ");
         scanf("%d", &type);
         switch(type){
@@ -336,12 +501,15 @@ int main()
                 break;
         }
         printf("Inserte la coordenada x donde desea colocar el barco: \n");
-        scanf("%d", &x);
+        scanf("%c", &coord);
+        x = letranumero(coord);
         printf("Inserte la coordenada y donde desea colocar el barco: \n");
         scanf("%d", &y);
         printf("Inserte la orientacion del barco (1=Horizontal, 2=Vertical): \n");
         scanf("%d", &rotation);
+        y-=1;
         finishedplacing = placement(myboard, type, x, y, rotation); //No es necesario verificar aqui los valores de entrada, ya que placement devuelve valores de error en esos casos
+        player1gold = player1gold - shipprices[type];
         finishedloop++;
     }
     if (player1gold < 0){
