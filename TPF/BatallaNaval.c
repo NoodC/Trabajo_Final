@@ -50,7 +50,7 @@ void addship(struct pivot* pivotvector, int x, int y, int type, int rotation){
 int shipregistry1[7] = {0,0,0,0,0,0,0}; //Vector que registra cuantos barcos hay de cada tipo, la posicion 0 no es usada
 int shipregistry2[7] = {0,0,0,0,0,0,0};
 int shipprices[5]={30,20,50,10,5}; //Precios de cada tipo de barco
-int skillprices[4]={7,3,50,4}; //Precio de las habilidades: Ataque Aereo, Disparo triple, Bomba Nuclear, Minas
+int skillprices[5]={0,7,3,50,4}; //Precio de las habilidades: Ataque Aereo, Disparo triple, Bomba Nuclear, Minas
 
 /*Vector de letras para convertir coordenadas a caracteres*/
 char letras[21] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'}; 
@@ -82,12 +82,12 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 1:
             length = 7;
             width = 2;
-            if ((rotation < 1) || (rotation > 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");}
             if (rotation == 1){
-                if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
+                if (((x+length) >= 21) || ((y+width) >= 21)){return -2; printf("Fuera de los limites del tablero");}
                 for (i = x; i < x+length; i++){
                     for (j = y; j < y+width; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0){return -3; printf("Una casilla esta ocupada por otro barco");}; 
                     }
                 }
                 for (i = x; i < x+length; i++){
@@ -96,10 +96,10 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
                     }
                 }
             } else {
-                if (((x+width) >= 21) || ((y+length) >= 21)) return -2;
+                if (((x+width) >= 21) || ((y+length) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+width; i++){
                     for (j = y; j < y+length; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+width; i++){
@@ -114,12 +114,12 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 2:
             length = 7;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
             if (rotation == 1){
-                if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
+                if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
                     for (j = y; j < y+width; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+length; i++){
@@ -128,10 +128,10 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
                     }
                 }
             } else {
-                if (((x+width) >= 21) || ((y+length) >= 21)) return -2;
+                if (((x+width) >= 21) || ((y+length) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+width; i++){
                     for (j = y; j < y+length; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+width; i++){
@@ -146,12 +146,12 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 3:
             length = 5;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
             if (rotation == 1){
-                if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
+                if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
                     for (j = y; j < y+width; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+length; i++){
@@ -160,10 +160,10 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
                     }
                 }
             } else {
-                if (((x+width) >= 21) || ((y+length) >= 21)) return -2;
+                if (((x+width) >= 21) || ((y+length) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+width; i++){
                     for (j = y; j < y+length; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+width; i++){
@@ -178,12 +178,12 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 4:
             length = 5;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
             if (rotation == 1){
-                if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
+                if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
                     for (j = y; j < y+width; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+length; i++){
@@ -192,10 +192,10 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
                     }
                 }
             } else {
-                if (((x+width) >= 21) || ((y+length) >= 21)) return -2;
+                if (((x+width) >= 21) || ((y+length) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+width; i++){
                     for (j = y; j < y+length; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+width; i++){
@@ -210,12 +210,12 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 5:
             length = 2;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
             if (rotation == 1){
-                if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
+                if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
                     for (j = y; j < y+width; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+length; i++){
@@ -224,10 +224,10 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
                     }
                 }
             } else {
-                if (((x+width) >= 21) || ((y+length) >= 21)) return -2;
+                if (((x+width) >= 21) || ((y+length) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+width; i++){
                     for (j = y; j < y+length; j++){
-                        if (board[i][j].is_ship != 0) return -3;
+                        if (board[i][j].is_ship != 0) {return -3; printf("Una casilla esta ocupada por otro barco");};
                     }
                 }
                 for (i = x; i < x+width; i++){
@@ -240,6 +240,7 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
             return 0;
             break;
         default:
+            printf("El tipo de barco no existe");
             return -4;
             break;
         }
@@ -252,8 +253,10 @@ Pensado para que pueda usarse tambien con los misiles*/
 int shoot(struct square(*board)[21], int x, int y){
     if (board[x][y].bombed == 1) return -1; //La casilla ya ha sido disparada
     board[x][y].bombed = 1;
-    if (board[x][y].is_ship == 1){printf("Acertaste\n");
-    return 1;} //Acierto
+    if (board[x][y].is_ship == 1){
+        printf("Acertaste\n");
+        return 1; //Acierto
+    }
     printf("Agua\n");
     return 0; //Fallo
 }
@@ -512,8 +515,16 @@ int main()
                 finishedplacing = 1;
                 break;
         }
-        if(finishedplacing == 0) 
-            {printf("Inserte la coordenada x donde desea colocar el barco: \n");
+        if(finishedplacing == 0) {
+            printf("Desea colocar el barco al azar? (Y/N)\n");
+            char answer;
+            getchar();
+            scanf("%c", &answer);
+            if (answer == 'Y'){
+                x = generateRandomNumber();
+                y = generateRandomNumber();
+            }
+            printf("Inserte la coordenada x donde desea colocar el barco: \n");
             getchar();
             scanf(" %c", &coord);
             x = letranumero(coord);
@@ -523,7 +534,8 @@ int main()
             scanf("%d", &rotation);
             y= y - 1;
             finishedplacing = placement(myboard, type, rotation, x, y); //No es necesario verificar aqui los valores de entrada, ya que placement devuelve valores de error en esos casos
-            player1gold = player1gold - shipprices[type];}
+            player1gold = player1gold - shipprices[type];
+        }
         finishedloop++;
     }
     if (player1gold > 0){
@@ -553,23 +565,93 @@ int main()
     else{ 
         printf("No se pudo colocar el barco de la PC, saliendo...\n");
         exit(-1);}
-
-    int turn = 1;
+    int player2gold = STARTING_GOLD;
+    int player2ammo = 0;
+    int turn = 1; //Inicio de las mecanicas de turno
     int endflag = 0;
     while(endflag = 0) {
         if (turn%2 == 1){
             printf("Turno de %s\n", name);
+            printf("Tu tablero");
+            for (int i = 0; i < 21; i++){
+                for (int j = 0; j < 21; j++){
+                    printf("%d", myboard[i][j].is_ship);
+                }
+                printf("\n");
+            }
+            printf("Tablero de la PC");
+            for (int i = 0; i < 21; i++){
+                for (int j = 0; j < 21; j++){
+                    printf("%d", theirboard[i][j].bombed);
+                }
+                printf("\n");
+            }
+            printf("Ingrese 1 para disparo normal, 2 para disparo especial");
+            int shottype;
+            scanf("%d", &shottype);
+            if (shottype == 1){
             printf("Ingrese las coordenadas para disparo directo:");
             int x, y;
             scanf("%d %d", &x, &y);
             int result = shoot(theirboard, x, y);
-            turn++;
+            turn++;} else{
+                printf("Ingrese 1 para ataque aereo, 2 para disparo triple, 3 para bomba nuclear, 4 para minas");
+                {
+                    int specialtype;
+                    scanf("%d", &specialtype);
+                    if (specialtype == 1){
+                        if(player1ammo < skillprices[specialtype]) {printf("No tienes suficiente municion"); break;}
+                        else{player1ammo = player1ammo - skillprices[specialtype];
+                        printf("Ingrese las coordenadas para ataque aereo:");
+                        char a;
+                        int x, y;
+                        scanf("%c %d", &a, &y);
+                        x = letranumero(a);
+                        int result = airstrike(theirboard, x, y);
+                        turn++;}
+                    }else if (specialtype == 2){
+                        if(player1ammo < skillprices[specialtype]) {printf("No tienes suficiente municion"); break;}
+                        else{player1ammo = player1ammo - skillprices[specialtype];
+                        int result = missile(theirboard);
+                        turn++;}
+                    }else if (specialtype == 3){
+                        if(player1ammo < skillprices[specialtype]) {printf("No tienes suficiente municion"); break;}
+                        else{player1ammo = player1ammo - skillprices[specialtype];
+                        printf("Ingrese las coordenadas para bomba nuclear:");
+                        int x, y;
+                        char a;
+                        scanf("%c %d", &a, &y);
+                        x = letranumero(a);
+                        int result = nuke(theirboard, x, y);
+                        turn++;}
+                    }else if(specialtype == 4){
+                        if(player1ammo < skillprices[specialtype]) {printf("No tienes suficiente municion"); break;}
+                        else{player1ammo = player1ammo - skillprices[specialtype];
+                        printf("Ingrese las coordenadas para minas:");
+                        int x, y;
+                        char a;
+                        scanf("%c %d", &a, &y);
+                        x = letranumero(a);
+                        int result = mine(theirboard, x, y);
+                        turn++;}
+                        }
+                    }
+                }
+            }if (player1ammo == 0){
+                printf("Sin municion. Fin de la partida\n");
+                endflag = 1;
         } else {
             printf("Turno de la PC\n");
             int x = generateRandomNumber();
             int y = generateRandomNumber();
             int result = shoot(myboard, x, y);
             turn++;
+            if (player2ammo == 0){
+                printf("Sin municion. Fin de la partida\n");
+                endflag = 1;
+
+        
+
         }
     }
     
