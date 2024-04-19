@@ -82,7 +82,7 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 1:
             length = 7;
             width = 2;
-            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");}
+            if ((rotation < 1) || (rotation > 2)) {return -1; printf("No se pudo colocar el barco");}
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)){return -2; printf("Fuera de los limites del tablero");}
                 for (i = x; i < x+length; i++){
@@ -114,7 +114,7 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 2:
             length = 7;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
+            if ((rotation < 1) || (rotation > 2)) {return -1; printf("No se pudo colocar el barco");};
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
@@ -146,7 +146,7 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 3:
             length = 5;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
+            if ((rotation < 1) || (rotation > 2)) {return -1; printf("No se pudo colocar el barco");};
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
@@ -178,7 +178,7 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 4:
             length = 5;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
+            if ((rotation < 1) || (rotation > 2)) {return -1; printf("No se pudo colocar el barco");};
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
@@ -210,7 +210,7 @@ int placement(struct square (*board)[21], int type, int rotation, int x, int y){
         case 5:
             length = 2;
             width = 1;
-            if ((rotation < 1) || (rotation > 2)) {return -1, printf("No se pudo colocar el barco");};
+            if ((rotation < 1) || (rotation > 2)) {return -1; printf("No se pudo colocar el barco");};
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) {return -2; printf("Fuera de los limites del tablero");};
                 for (i = x; i < x+length; i++){
@@ -381,7 +381,7 @@ int is_ship_sunk(struct square(*board)[21], int x, int y){ //Estas coordenadas d
         }
         for (i = 0; i < length; i++){
             for (int j = 0; j < width; j++){
-                if (board[i][j].bombed = 0) NotSunk = 1;
+                if (board[i][j].bombed == 0) NotSunk = 1;
             }
         }
         if(NotSunk == 1) return 0;
@@ -523,13 +523,14 @@ int main()
             if (answer == 'Y'){
                 x = generateRandomNumber();
                 y = generateRandomNumber();
+            }else{
+                printf("Inserte la coordenada x donde desea colocar el barco: \n");
+                getchar();
+                scanf(" %c", &coord);
+                x = letranumero(coord);
+                printf("Inserte la coordenada y donde desea colocar el barco: \n");
+                scanf("%d", &y);
             }
-            printf("Inserte la coordenada x donde desea colocar el barco: \n");
-            getchar();
-            scanf(" %c", &coord);
-            x = letranumero(coord);
-            printf("Inserte la coordenada y donde desea colocar el barco: \n");
-            scanf("%d", &y);
             printf("Inserte la orientacion del barco (1=Horizontal, 2=Vertical): \n");
             scanf("%d", &rotation);
             y= y - 1;
@@ -561,25 +562,24 @@ int main()
     int y = 6;
     int lado = 2;
     int PCflag = placement (theirboard, barco, lado, x, y);
-    if (PCflag == 0) return 0;
-    else{ 
+    if (PCflag != 1){
         printf("No se pudo colocar el barco de la PC, saliendo...\n");
         exit(-1);}
     int player2gold = STARTING_GOLD;
     int player2ammo = 0;
     int turn = 1; //Inicio de las mecanicas de turno
     int endflag = 0;
-    while(endflag = 0) {
+    while(endflag == 0) {
         if (turn%2 == 1){
             printf("Turno de %s\n", name);
-            printf("Tu tablero");
+            printf("Tu tablero\n");
             for (int i = 0; i < 21; i++){
                 for (int j = 0; j < 21; j++){
                     printf("%d", myboard[i][j].is_ship);
                 }
                 printf("\n");
             }
-            printf("Tablero de la PC");
+            printf("Tablero de la PC\n");
             for (int i = 0; i < 21; i++){
                 for (int j = 0; j < 21; j++){
                     printf("%d", theirboard[i][j].bombed);
@@ -657,4 +657,5 @@ int main()
     
 
     return 0;
+}
 }
