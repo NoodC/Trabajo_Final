@@ -12,9 +12,12 @@ Para referencia: (valor asignado;tipo;area)(la mina a efectos practicos es un ba
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #define STARTING_GOLD 115
 #define STARTING_AMMO 100
+#define BOARDSIZE 21
 
 /*Cada casilla  es un stuct que contiene un valor que indica si hay un barco o no y su tipo, y un valor que indica si la casilla ha sido bombardeada o no*/
 
@@ -52,12 +55,17 @@ int skillprices[4]={7,3,50,4}; //Precio de las habilidades: Ataque Aereo, Dispar
 /*Vector de letras para convertir coordenadas a caracteres*/
 char letras[21] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'}; 
 
+/*Funcion para generar numeros aleatorios*/
+int generateRandomNumber() {
+    return (rand() % 20) + 1;
+}
+
 /*Funcion para convertir los caracteres a numeros*/
 int letranumero(char letra){
     int i;
     for (i=0; i<21; i++){
         if (letra == letras[i]){
-            return i+1;
+            return i;
         }
     }
     return -1; //Error
@@ -68,13 +76,13 @@ Devuelve un valor que indica la validez de la colocacion
 Notar que el barco siempre sera colocado a la derecha o abajo de la coordenada (x,y)*/
 //***Esta funcion puede ir a un archivo de cabecera en el futuro***
 //***PENDIENTE: Expandir los errores, colocar mensajes en la terminal***
-int placement(struct square board[21][21], int type, int rotation, int x, int y){
+int placement(struct square (*board)[21], int type, int rotation, int x, int y){
 	int i, j, length, width;
     switch(type){ // -1 si no se puede colocar, -2 si excede el tablero, -3 si ya hay un barco en esa casilla, -4 si el tipo de barco no existe, 0 si se coloca correctamente
         case 1:
             length = 7;
             width = 2;
-            if ((rotation != 1) && (rotation != 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) return -1;
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
                 for (i = x; i < x+length; i++){
@@ -106,7 +114,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
         case 2:
             length = 7;
             width = 1;
-            if ((rotation != 1) && (rotation != 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) return -1;
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
                 for (i = x; i < x+length; i++){
@@ -138,7 +146,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
         case 3:
             length = 5;
             width = 1;
-            if ((rotation != 1) && (rotation != 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) return -1;
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
                 for (i = x; i < x+length; i++){
@@ -170,7 +178,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
         case 4:
             length = 5;
             width = 1;
-            if ((rotation != 1) && (rotation != 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) return -1;
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
                 for (i = x; i < x+length; i++){
@@ -202,7 +210,7 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
         case 5:
             length = 2;
             width = 1;
-            if ((rotation != 1) && (rotation != 2)) return -1;
+            if ((rotation < 1) || (rotation > 2)) return -1;
             if (rotation == 1){
                 if (((x+length) >= 21) || ((y+width) >= 21)) return -2;
                 for (i = x; i < x+length; i++){
@@ -241,16 +249,18 @@ int placement(struct square board[21][21], int type, int rotation, int x, int y)
 Devuelve un valor que indica la validez del disparo: 0 si el disparo no ha sido exitoso, 1 si el disparo ha sido exitoso, 
 -1 si ya se ha disparado en esa casilla
 Pensado para que pueda usarse tambien con los misiles*/
-int shoot(struct square board[21][21], int x, int y){
+int shoot(struct square(*board)[21], int x, int y){
     if (board[x][y].bombed == 1) return -1; //La casilla ya ha sido disparada
     board[x][y].bombed = 1;
-    if (board[x][y].is_ship == 1) return 1; //Acierto
+    if (board[x][y].is_ship == 1){printf("Acertaste\n");
+    return 1;} //Acierto
+    printf("Agua\n");
     return 0; //Fallo
 }
 
 /*Funcion que permite lanzar la bomba atomica, recibe como parametro un tablero y las coordenadas centrales (x,y), pero cubre un rango de 5x5
 No puede ser lanzada en una casilla ya bombardeada o en las 2 filas y columnas mas externas de cada borde*/
-int nuke(struct square board[21][21], int x, int y){
+int nuke(struct square(*board)[21], int x, int y){
     if ((x-2)<0 || (y-2)<0 || (x+2)>=21 || (y+2)>=21) return -2; // Fuera de rango
     if (board[x][y].bombed == 1) return -1; // Ya bombardeada
     for (int i = x-2; i <= x+2; i++){
@@ -262,7 +272,7 @@ int nuke(struct square board[21][21], int x, int y){
 }
 
 /*Funcion que realiza un ataque aereo en 7 casillas arriba de la coordenada (x,y). Devuelve 0 si no hubo impacto, 1 si hubo impacto */
-int airstrike(struct square board[21][21], int x, int y){
+int airstrike(struct square(*board)[21], int x, int y){
     int hit;
     for (int j = (y - 1) ; j == (y - 8) ; j--){
         if(j < 0) break; //Si se sale del rango del tablero, se rompe el loop
@@ -274,7 +284,7 @@ int airstrike(struct square board[21][21], int x, int y){
 };
 
 /*Funcion que lanza 3 misiles, recibe como parametro un tablero*/
-int missile(struct square board[21][21]){
+int missile(struct square(*board)[21]){
     int missilesuccess = 0; //Bandera para saber si el disparo ha sido exitoso
     for (int i = 0; i<3; i++){ //Se dispara 3 veces
         while(missilesuccess != 1){ //Mientras el disparo no sea exitoso, se repite
@@ -294,7 +304,7 @@ int missile(struct square board[21][21]){
 }
 
 /*Funcion para colocar minas, recibe como parametro un tablero y las coordenadas (x,y)*/
-int mine(struct square board[21][21], int x, int y){
+int mine(struct square(*board)[21], int x, int y){
     if(board[x][y].is_ship != 0) return -1; //La casilla ya esta ocupada
     board[x][y].is_ship = 6;
     return 0; //Colocado con exito
@@ -302,7 +312,7 @@ int mine(struct square board[21][21], int x, int y){
 
 /*Funcion que permite verificar si un barco ha sido hundido, retorna 1 si es hundido, 0 si no*/
 /****A futuro, cambiar por una solucion con memoria dinamica, como un vector que almacene los barcos individualmente****/
-int is_ship_sunk(struct square board[21][21], int x, int y){ //Estas coordenadas deben ser el lugar donde hubo un ataque
+int is_ship_sunk(struct square(*board)[21], int x, int y){ //Estas coordenadas deben ser el lugar donde hubo un ataque
     if((board[x][y].is_ship == 1)&&(board[x][y].bombed == 1)) {
         int i = 1;
         int NotAShipX = 0;
@@ -381,7 +391,7 @@ int is_ship_sunk(struct square board[21][21], int x, int y){ //Estas coordenadas
 
 /***FUNCION INCOMPLETA Y SIN PROBAR***/
 
-/*int evasion(struct square board[21][21]){
+/*int evasion(struct square(*board)[21]){
     int x1, y1, x2, y2, direccion;
     char a1, a2;
     printf("Ingrese las coordenadas de la punta del barco (donde fue colocado al principio):\n");
@@ -445,34 +455,30 @@ int is_ship_sunk(struct square board[21][21], int x, int y){ //Estas coordenadas
 }
 */
 
-/*Funcion para inicializar el tablero de la computadora, funcion placeholder, no es definitiva
-Coloca un buque en L6 en posicion vertical, y no compra municion con el oro restante*/
-int setupPC(struct square board[21][21]){ 
-    int barco = 2;
-    int x = 12;
-    int y = 6;
-    int lado = 2;
-    int PCflag =placement (board, barco, lado, x, y);
-    if (PCflag == 0) return 0;
-    else{ 
-        printf("No se pudo colocar el barco de la PC, saliendo...\n");
-        exit(-1);}
-}
+
 int main()
 {
+    srand(time(0)); //Semilla del generador de numeros aleatorios
     struct square myboard[21][21]; //Inicializacion del tablero del usuario
     int i, j;
     for (i = 0; i < 21; i++){
         for (j = 0; j < 21; j++){
             myboard[i][j].is_ship = 0;
             myboard[i][j].bombed = 0;
+            myboard[i][j].is_pivot = 0;
         }
     }
+    printf("Bienvenido al juego de batalla naval!\n");
+    char name[50];
+    printf("Ingrese su nombre de jugador: ");
+    scanf("%49s", name);
+    printf("Muy bien, %s, comencemos el juego!\n", name);
     int player1gold = STARTING_GOLD;
     int player1ammo = STARTING_AMMO;
     int finishedplacing = 0;
     int finishedloop = 0;
-    while(((player1gold > 5) || (finishedplacing == 1))&&(finishedloop == 2)){ //El loop se completa por lo menos dos veces, debido a la bandera finishedloop
+    while(((player1gold > 5) || (finishedplacing != 1))&&(finishedloop != 2)){ //El loop se completa por lo menos dos veces, debido a la bandera finishedloop
+        finishedplacing = 0;
         int type, x, y, rotation;
         char coord;
         printf("Ingrese el tipo de barco (1-5), 0 para terminar, si ya ha colocado un barco: ");
@@ -482,39 +488,48 @@ int main()
                 finishedplacing = 1;
                 break;
             case 1:
-                if(player1gold < 30) printf("Oro insuficiente\n");
+                if(player1gold < 30) {printf("Oro insuficiente\n");
+                finishedplacing = 1;}
                 break;
             case 2:
-                if(player1gold < 20) printf("Oro insuficiente\n");
+                if(player1gold < 20) {printf("Oro insuficiente\n");
+                finishedplacing = 1;}
                 break;
             case 3:
-                if(player1gold < 50) printf("Oro insuficiente\n");
+                if(player1gold < 50) {printf("Oro insuficiente\n");
+                finishedplacing = 1;}
                 break;
             case 4:
-                if(player1gold < 10) printf("Oro insuficiente\n");
+                if(player1gold < 10) {printf("Oro insuficiente\n");
+                finishedplacing = 1;}
                 break;
             case 5:
-                if(player1gold < 5) printf("Oro insuficiente\n");
+                if(player1gold < 5) {printf("Oro insuficiente\n");
+                finishedplacing = 1;}
                 break;
             default:
                 printf("Tipo de barco no valido, o error en la entrada\n");
+                finishedplacing = 1;
                 break;
         }
-        printf("Inserte la coordenada x donde desea colocar el barco: \n");
-        scanf("%c", &coord);
-        x = letranumero(coord);
-        printf("Inserte la coordenada y donde desea colocar el barco: \n");
-        scanf("%d", &y);
-        printf("Inserte la orientacion del barco (1=Horizontal, 2=Vertical): \n");
-        scanf("%d", &rotation);
-        y-=1;
-        finishedplacing = placement(myboard, type, x, y, rotation); //No es necesario verificar aqui los valores de entrada, ya que placement devuelve valores de error en esos casos
-        player1gold = player1gold - shipprices[type];
+        if(finishedplacing == 0) 
+            {printf("Inserte la coordenada x donde desea colocar el barco: \n");
+            getchar();
+            scanf(" %c", &coord);
+            x = letranumero(coord);
+            printf("Inserte la coordenada y donde desea colocar el barco: \n");
+            scanf("%d", &y);
+            printf("Inserte la orientacion del barco (1=Horizontal, 2=Vertical): \n");
+            scanf("%d", &rotation);
+            y= y - 1;
+            finishedplacing = placement(myboard, type, rotation, x, y); //No es necesario verificar aqui los valores de entrada, ya que placement devuelve valores de error en esos casos
+            player1gold = player1gold - shipprices[type];}
         finishedloop++;
     }
-    if (player1gold < 0){
+    if (player1gold > 0){
         printf("Desea convertir el oro restante en municion? (Y/N)\n");
         char answer;
+        getchar();
         scanf("%c", &answer);
         if (answer == 'Y'){
             player1ammo = player1ammo + player1gold;
@@ -526,9 +541,37 @@ int main()
         for (j = 0; j < 21; j++){
             theirboard[i][j].is_ship = 0;
             theirboard[i][j].bombed = 0;
+            theirboard[i][j].is_pivot = 0;
         }
     }
+    int barco = 2; //Setup basico de la PC
+    int x = 12;
+    int y = 6;
+    int lado = 2;
+    int PCflag = placement (theirboard, barco, lado, x, y);
+    if (PCflag == 0) return 0;
+    else{ 
+        printf("No se pudo colocar el barco de la PC, saliendo...\n");
+        exit(-1);}
 
+    int turn = 1;
+    int endflag = 0;
+    while(endflag = 0) {
+        if (turn%2 == 1){
+            printf("Turno de %s\n", name);
+            printf("Ingrese las coordenadas para disparo directo:");
+            int x, y;
+            scanf("%d %d", &x, &y);
+            int result = shoot(theirboard, x, y);
+            turn++;
+        } else {
+            printf("Turno de la PC\n");
+            int x = generateRandomNumber();
+            int y = generateRandomNumber();
+            int result = shoot(myboard, x, y);
+            turn++;
+        }
+    }
     
 
     return 0;
